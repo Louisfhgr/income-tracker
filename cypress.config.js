@@ -1,17 +1,9 @@
-import { defineConfig } from "cypress";
-
-export default defineConfig({
-  video: false,
-
+export default {
   e2e: {
-    setupNodeEvents(on, config) {},
-    baseUrl: "http://localhost:3000",
-  },
-
-  component: {
-    devServer: {
-      framework: "vue",
-      bundler: "vite",
+    setupNodeEvents(on, config) {
+      // implement node event listeners here
     },
+    experimentalStudio: true,
+    supportFile: false
   },
-});
+};

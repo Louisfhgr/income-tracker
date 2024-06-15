@@ -1,0 +1,118 @@
+/* main.css */
+
+/* Globale Stile für die gesamte Anwendung */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+p {
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #0ea336;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px; /* Abstand zwischen den Buttons */
+  display: block;
+  margin: 10px auto; /* Zentrieren der Buttons */
+}
+
+button:hover {
+  background-color: #0b4e22;
+}
+
+label {
+  margin-right: 10px;
+}
+
+select {
+  margin-right: 20px;
+}
+
+.table-container {
+  max-height: 200px; /* Feste Höhe für den Tabellenkörper */
+  overflow-y: auto; /* Ermöglicht das vertikale Scrollen */
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+/* Formular zentrieren */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form input {
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
+}
+
+form button {
+  width: 100%;
+  max-width: 150px;
+}
+
+/* Responsives Canvas-Element */
+canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  form input {
+    max-width: 100%;
+  }
+
+  form button {
+    max-width: 100%;
+  }
+}

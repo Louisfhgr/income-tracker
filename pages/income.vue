@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h1>Einkommen</h1>
     <p v-if="user">Angemeldet als: {{ user.email }}</p>
     <p v-else>Bitte melden Sie sich an.</p>
@@ -49,7 +49,7 @@
       </table>
     </div>
 
-    <canvas id="incomeChart" width="400" height="200"></canvas>
+    <canvas id="incomeChart"></canvas>
   </div>
 </template>
 
@@ -116,7 +116,7 @@ const filteredIncomes = computed(() => {
 
 // Computed Property für die letzten fünf Einträge
 const lastFiveIncomes = computed(() => {
-  return filteredIncomes.value.slice(-3)
+  return filteredIncomes.value.slice(-5)
 })
 
 // Computed Property für einzigartige Quellen
@@ -246,46 +246,3 @@ onMounted(() => {
   })
 })
 </script>
-
-<style scoped>
-.table-container {
-  max-height: 200px; /* Feste Höhe für den Tabellenkörper */
-  overflow-y: auto; /* Ermöglicht das vertikale Scrollen */
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-table, th, td {
-  border: 1px solid #ddd;
-}
-
-th, td {
-  padding: 10px;
-  text-align: left;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  margin-right: 10px; /* Abstand zwischen den Buttons */
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-label {
-  margin-right: 10px;
-}
-
-select {
-  margin-right: 20px;
-}
-</style>
