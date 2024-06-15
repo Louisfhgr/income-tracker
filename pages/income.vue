@@ -8,6 +8,7 @@
     
 
     <form @submit.prevent="addIncome" v-if="user">
+      
       <input v-model="amount" type="number" placeholder="Betrag" required />
       <input v-model="source" type="text" placeholder="Quelle" required />
       <button type="submit">Hinzufügen</button>

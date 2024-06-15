@@ -6,25 +6,14 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
   background-color: #f4f4f4;
 }
 
-.container {
-  width: 90%;
-  max-width: 800px;
-  margin: 20px;
-  padding: 20px;
-  background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
 h1, h2, h3, h4, h5, h6 {
+  
   margin: 0 0 10px 0;
   text-align: center;
+
 }
 
 p {
@@ -32,39 +21,49 @@ p {
   text-align: center;
 }
 
-
-button {
+button, .btn-link {
   padding: 10px 20px;
   background-color: #0ea336;
   color: white;
   border: none;
   cursor: pointer;
   margin-right: 10px; /* Abstand zwischen den Buttons */
-  display: block;
-  margin: 10px auto; /* Zentrieren der Buttons */
+  text-decoration: none; /* Entfernt die Unterstreichung von Links */
+  display: inline-block;
+  text-align: center;
 }
 
-button:hover {
+button:hover, .btn-link:hover {
   background-color: #0b4e22;
 }
 
 label {
   margin-right: 10px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 select {
   margin-right: 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 .table-container {
   max-height: 200px; /* Feste Höhe für den Tabellenkörper */
   overflow-y: auto; /* Ermöglicht das vertikale Scrollen */
+  /*tabelle unten*/
   margin-top: 20px;
+  margin-bottom: 20px;
+
+  
+
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 20;
   margin-bottom: 20px;
 }
 
@@ -77,45 +76,47 @@ th, td {
   text-align: center;
 }
 
-/* Formular zentrieren */
+/* Spezifische Stile für die Login-Seite */
+.login-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
 form {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-form input {
+input {
   margin-bottom: 10px;
   padding: 10px;
-  width: 100%;
-  max-width: 300px;
+  width: 90%;
   box-sizing: border-box;
 }
 
-form button {
-  width: 100%;
-  max-width: 150px;
+.register-link {
+  margin-top: 20px;
 }
 
-/* Responsives Canvas-Element */
-canvas {
-  width: 100% !important;
-  height: auto !important;
+.register-link p {
+  margin: 0;
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
+/* Spezifische Stile für die Startseite */
+.home-container {
+  text-align: center;
+  padding: 50px 20px;
+}
 
-  form input {
-    max-width: 80%;
-  }
+.link-container {
+  margin-top: 20px;
+}
 
-  form button {
-    width: 90%;
-    max-width: 100px;
-
-  }
+.link-container .btn-link {
+  margin-right: 20px;
 }

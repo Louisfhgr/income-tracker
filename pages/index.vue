@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <div class="home-container">
     <h1>Willkommen zur Startseite</h1>
-    <p>Dies ist die Hauptseite Ihrer Nuxt.js-Anwendung.</p>
-    <nuxt-link to="/login">Login</nuxt-link>
-    <nuxt-link to="/register">Registrieren</nuxt-link>
+    <p></p>
+    <div class="link-container">
+      <nuxt-link to="/login" class="btn-link">Login</nuxt-link>
+      <nuxt-link to="/register" class="btn-link">Registrieren</nuxt-link>
+    </div>
   </div>
 </template>
 
