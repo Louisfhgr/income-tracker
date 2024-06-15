@@ -60,15 +60,33 @@ const amount = ref(0)
 const source = ref('')
 const selectedSource = ref('')
 const selectedDate = ref('')
+const user = ref(null)
 
 // Zugriff auf Supabase aus dem Nuxt App Kontext
 const { $supabase } = useNuxtApp()
 
+// Funktion zum Abrufen des aktuellen Benutzers
+const fetchUser = async () => {
+  const { data, error } = await $supabase.auth.getSession()
+  if (error) {
+    console.error('Fehler beim Abrufen der Benutzersitzung:', error)
+  } else if (data.session) {
+    user.value = data.session.user
+    console.log('Benutzer eingeloggt:', user.value)
+    fetchIncomes()
+  } else {
+    console.error('Keine aktive Sitzung gefunden')
+  }
+}
+
 // Funktion zum Abrufen der Einkommensdaten
 const fetchIncomes = async () => {
+  if (!user.value) return
+
   const { data, error } = await $supabase
     .from('incomes')
     .select('*')
+    .eq('user_id', user.value.id)
     .order('created_at', { ascending: true }) // Daten nach Datum sortieren
 
   if (!error) {
@@ -160,7 +178,12 @@ watch(filteredIncomes, updateChart)
 
 // Funktion zum Hinzufügen neuer Einkommensdaten
 const addIncome = async () => {
-  const { data, error } = await $supabase.from('incomes').insert([{ amount: amount.value, source: source.value }])
+  if (!user.value) return
+
+  const { data, error } = await $supabase
+    .from('incomes')
+    .insert([{ amount: amount.value, source: source.value, user_id: user.value.id }])
+  
   if (!error) {
     incomes.value.push(data[0])
     console.log('Einkommen erfolgreich hinzugefügt:', data)
@@ -174,7 +197,14 @@ const addIncome = async () => {
 
 // Funktion zum Löschen von Einkommensdaten
 const deleteIncome = async (id) => {
-  const { error } = await $supabase.from('incomes').delete().eq('id', id)
+  if (!user.value) return
+
+  const { error } = await $supabase
+    .from('incomes')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.value.id)
+  
   if (!error) {
     incomes.value = incomes.value.filter(income => income.id !== id)
     console.log('Einkommen erfolgreich gelöscht:', id)
@@ -186,7 +216,7 @@ const deleteIncome = async (id) => {
 
 // Lifecycle Hooks zum Abrufen der Daten und Einrichten der Realtime-Subscription
 onMounted(() => {
-  fetchIncomes()
+  fetchUser()
   const subscription = $supabase
     .channel('public:incomes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'incomes' }, payload => {
