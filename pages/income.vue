@@ -1,10 +1,11 @@
 <template>
   <div class="container">
-    <h1>Einkommen</h1>
+    
+    <h1>Haushaltsbudget</h1>
     <p v-if="user">Angemeldet als: {{ user.email }}</p>
     <p v-else>Bitte melden Sie sich an.</p>
     
-    <button @click="logout" v-if="user">Logout</button>
+    
 
     <form @submit.prevent="addIncome" v-if="user">
       <input v-model="amount" type="number" placeholder="Betrag" required />
@@ -25,6 +26,7 @@
         <option v-for="date in uniqueDates" :key="date" :value="date">{{ new Date(date).toLocaleDateString() }}</option>
       </select>
     </div>
+    
 
     <div class="table-container" v-if="user">
       <table>
@@ -51,7 +53,9 @@
 
     <canvas id="incomeChart"></canvas>
   </div>
+  <button @click="logout" v-if="user">Logout</button>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'

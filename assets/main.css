@@ -14,7 +14,7 @@ body {
 }
 
 .container {
-  width: 100%;
+  width: 90%;
   max-width: 800px;
   margin: 20px;
   padding: 20px;
@@ -31,6 +31,7 @@ p {
   margin: 0 0 10px 0;
   text-align: center;
 }
+
 
 button {
   padding: 10px 20px;
@@ -73,7 +74,7 @@ table, th, td {
 
 th, td {
   padding: 10px;
-  text-align: left;
+  text-align: center;
 }
 
 /* Formular zentrieren */
@@ -109,10 +110,12 @@ canvas {
   }
 
   form input {
-    max-width: 100%;
+    max-width: 80%;
   }
 
   form button {
-    max-width: 100%;
+    width: 90%;
+    max-width: 100px;
+
   }
 }
