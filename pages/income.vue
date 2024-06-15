@@ -1,13 +1,18 @@
 <template>
   <div>
     <h1>Einkommen</h1>
-    <form @submit.prevent="addIncome">
+    <p v-if="user">Angemeldet als: {{ user.email }}</p>
+    <p v-else>Bitte melden Sie sich an.</p>
+    
+    <button @click="logout" v-if="user">Logout</button>
+
+    <form @submit.prevent="addIncome" v-if="user">
       <input v-model="amount" type="number" placeholder="Betrag" required />
       <input v-model="source" type="text" placeholder="Quelle" required />
       <button type="submit">Hinzufügen</button>
     </form>
 
-    <div>
+    <div v-if="user">
       <label for="sourceFilter">Quelle:</label>
       <select v-model="selectedSource" @change="updateChart">
         <option value="">Alle</option>
@@ -21,7 +26,7 @@
       </select>
     </div>
 
-    <div class="table-container">
+    <div class="table-container" v-if="user">
       <table>
         <thead>
           <tr>
@@ -53,6 +58,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import Chart from 'chart.js/auto'
 import 'chartjs-adapter-date-fns'
 import { useNuxtApp } from '#app'
+import { useRouter } from 'vue-router'
 
 // Referenzen für die Daten und die Eingabe
 const incomes = ref([])
@@ -64,6 +70,7 @@ const user = ref(null)
 
 // Zugriff auf Supabase aus dem Nuxt App Kontext
 const { $supabase } = useNuxtApp()
+const router = useRouter()
 
 // Funktion zum Abrufen des aktuellen Benutzers
 const fetchUser = async () => {
@@ -109,9 +116,7 @@ const filteredIncomes = computed(() => {
 
 // Computed Property für die letzten fünf Einträge
 const lastFiveIncomes = computed(() => {
-  const end = filteredIncomes.value.length
-  const start = end > 5 ? end - 5 : 0
-  return filteredIncomes.value.slice(start, end)
+  return filteredIncomes.value.slice(-3)
 })
 
 // Computed Property für einzigartige Quellen
@@ -214,6 +219,17 @@ const deleteIncome = async (id) => {
   }
 }
 
+// Funktion zum Abmelden
+const logout = async () => {
+  const { error } = await $supabase.auth.signOut()
+  if (error) {
+    console.error('Fehler beim Abmelden:', error)
+  } else {
+    user.value = null
+    router.push('/')
+  }
+}
+
 // Lifecycle Hooks zum Abrufen der Daten und Einrichten der Realtime-Subscription
 onMounted(() => {
   fetchUser()
@@ -258,6 +274,7 @@ button {
   color: white;
   border: none;
   cursor: pointer;
+  margin-right: 10px; /* Abstand zwischen den Buttons */
 }
 
 button:hover {
