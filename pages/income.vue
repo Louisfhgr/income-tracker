@@ -1,34 +1,45 @@
 <template>
   <div class="container">
-    
     <h1>Haushaltsbudget</h1>
     <p v-if="user">Angemeldet als: {{ user.email }}</p>
     <p v-else>Bitte melden Sie sich an.</p>
-    
-    
 
-    <form @submit.prevent="addIncome" v-if="user">
-      
+    <!-- Formular zum Hinzufügen oder Bearbeiten von Einnahmen -->
+    <form @submit.prevent="isEditing ? updateIncome() : addIncome()" v-if="user">
       <input v-model="amount" type="number" placeholder="Betrag" required />
       <input v-model="source" type="text" placeholder="Quelle" required />
-      <button type="submit">Hinzufügen</button>
+      <button type="submit">{{ isEditing ? 'Aktualisieren' : 'Hinzufügen' }}</button>
+      <button @click="cancelEdit" type="button" v-if="isEditing">Abbrechen</button>
     </form>
 
-    <div v-if="user">
-      <label for="sourceFilter">Quelle:</label>
-      <select v-model="selectedSource" @change="updateChart">
-        <option value="">Alle</option>
-        <option v-for="source in uniqueSources" :key="source" :value="source">{{ source }}</option>
-      </select>
+    <!-- Filteroptionen -->
+    <div v-if="user" class="filter-container">
+      <!-- Filter nach Quelle -->
+      <div class="filter-item">
+        <label for="sourceFilter">Quelle:</label>
+        <select v-model="selectedSource" @change="updateChart">
+          <option value="">Alle</option>
+          <option v-for="source in uniqueSources" :key="source" :value="source">{{ source }}</option>
+        </select>
+      </div>
 
-      <label for="dateFilter">Datum:</label>
-      <select v-model="selectedDate" @change="updateChart">
-        <option value="">Alle</option>
-        <option v-for="date in uniqueDates" :key="date" :value="date">{{ new Date(date).toLocaleDateString() }}</option>
-      </select>
+      <!-- Filter nach Datum -->
+      <div class="filter-item">
+        <label for="dateFilter">Datum:</label>
+        <select v-model="selectedDate" @change="updateChart">
+          <option value="">Alle</option>
+          <option v-for="date in uniqueDates" :key="date" :value="date">{{ new Date(date).toLocaleDateString() }}</option>
+        </select>
+      </div>
+
+      <!-- Filter nach Anzahl der Einträge -->
+      <div class="filter-item">
+        <label for="entryCount">Anzahl der Einträge:</label>
+        <input v-model.number="entryCount" type="number" min="1" placeholder="Anzahl der Einträge" @input="updateChart" />
+      </div>
     </div>
-    
 
+    <!-- Tabelle der letzten Einnahmen -->
     <div class="table-container" v-if="user">
       <table>
         <thead>
@@ -40,11 +51,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="income in lastFiveIncomes" :key="income.id">
+          <tr v-for="income in displayedIncomes" :key="income.id">
             <td>{{ income.amount }}</td>
             <td>{{ income.source }}</td>
             <td>{{ new Date(income.created_at).toLocaleString() }}</td>
             <td>
+              <button @click="startEdit(income)">Bearbeiten</button>
               <button @click="deleteIncome(income.id)">Löschen</button>
             </td>
           </tr>
@@ -52,28 +64,33 @@
       </table>
     </div>
 
+    <!-- Diagramm der Einnahmen -->
     <canvas id="incomeChart"></canvas>
   </div>
+  <!-- Abmeldebutton -->
   <button @click="logout" v-if="user">Logout</button>
 </template>
 
-
 <script setup>
+// Importiere die notwendigen Module und Hooks von Vue
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import Chart from 'chart.js/auto'
 import 'chartjs-adapter-date-fns'
 import { useNuxtApp } from '#app'
 import { useRouter } from 'vue-router'
 
-// Referenzen für die Daten und die Eingabe
+// Definiere die notwendigen Referenzen und Variablen
 const incomes = ref([])
 const amount = ref(0)
 const source = ref('')
 const selectedSource = ref('')
 const selectedDate = ref('')
 const user = ref(null)
+const isEditing = ref(false)
+const editIncomeId = ref(null)
+const entryCount = ref(5)  // Neue Variable für die Anzahl der Einträge
 
-// Zugriff auf Supabase aus dem Nuxt App Kontext
+// Zugriff auf Supabase und Router
 const { $supabase } = useNuxtApp()
 const router = useRouter()
 
@@ -119,9 +136,9 @@ const filteredIncomes = computed(() => {
   })
 })
 
-// Computed Property für die letzten fünf Einträge
-const lastFiveIncomes = computed(() => {
-  return filteredIncomes.value.slice(-5)
+// Computed Property für die angezeigten Einträge basierend auf der festgelegten Anzahl
+const displayedIncomes = computed(() => {
+  return filteredIncomes.value.slice(-entryCount.value)
 })
 
 // Computed Property für einzigartige Quellen
@@ -202,6 +219,46 @@ const addIncome = async () => {
     source.value = ''
   } else {
     console.error('Fehler beim Hinzufügen der Einnahmen:', error)
+  }
+}
+
+// Funktion zum Starten der Bearbeitung eines Einkommensdatensatzes
+const startEdit = (income) => {
+  isEditing.value = true
+  editIncomeId.value = income.id
+  amount.value = income.amount
+  source.value = income.source
+}
+
+// Funktion zum Abbrechen der Bearbeitung
+const cancelEdit = () => {
+  isEditing.value = false
+  editIncomeId.value = null
+  amount.value = 0
+  source.value = ''
+}
+
+// Funktion zum Aktualisieren von Einkommensdaten
+const updateIncome = async () => {
+  if (!user.value || !editIncomeId.value) return
+
+  const { error } = await $supabase
+    .from('incomes')
+    .update({ amount: amount.value, source: source.value })
+    .eq('id', editIncomeId.value)
+    .eq('user_id', user.value.id)
+  
+  if (!error) {
+    const index = incomes.value.findIndex(income => income.id === editIncomeId.value)
+    if (index !== -1) {
+      incomes.value[index].amount = amount.value
+      incomes.value[index].source = source.value
+    }
+    console.log('Einkommen erfolgreich aktualisiert:', editIncomeId.value)
+    fetchIncomes() // Nach dem Aktualisieren Daten erneut abrufen und sortieren
+    cancelEdit()
+  } else {
+    console.error('Fehler beim Aktualisieren der Einnahmen:', error)
   }
 }
 
