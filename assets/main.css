@@ -53,6 +53,7 @@ select {
   overflow-y: auto; /* Ermöglicht das vertikale Scrollen */
   margin-top: 20px;
   margin-bottom: 20px;
+  flex: 1 1 50%; /* Flex-Einstellungen für responsive Design */
 }
 
 table {
@@ -69,6 +70,13 @@ table, th, td {
 th, td {
   padding: 10px;
   text-align: center;
+}
+
+thead th {
+  position: sticky; /* Macht die Spaltenüberschriften fixiert */
+  top: 0; /* Fixiert sie am oberen Rand des Containers */
+  background: #f4f4f4; /* Hintergrundfarbe, um sie vom Rest der Tabelle abzuheben */
+  z-index: 1; /* Stellt sicher, dass die Spaltenüberschriften über den anderen Zellen liegen */
 }
 
 /* Spezifische Stile für die Login-Seite */
@@ -141,4 +149,20 @@ input {
   width: 150px;
   height: 36px; /* Einheitliche Höhe für select und input */
   box-sizing: border-box; /* Einschließen von Padding und Border in die Höhe */
+}
+
+/* Stile für die Container von Tabelle und Diagramm */
+.content-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.chart-container {
+  flex: 1 1 45%; /* Flex-Einstellungen für responsive Design */
+  min-width: 300px; /* Mindestbreite, damit sie nebeneinander passen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

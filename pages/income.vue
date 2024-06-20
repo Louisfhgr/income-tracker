@@ -4,6 +4,9 @@
     <p v-if="user">Angemeldet als: {{ user.email }}</p>
     <p v-else>Bitte melden Sie sich an.</p>
 
+    <!-- Gesamtbetrag anzeigen -->
+    <h2 v-if="user">Gesamteinkommen: {{ totalIncome }} €</h2>
+
     <!-- Formular zum Hinzufügen oder Bearbeiten von Einnahmen -->
     <form @submit.prevent="isEditing ? updateIncome() : addIncome()" v-if="user">
       <input v-model="amount" type="number" placeholder="Betrag" required />
@@ -39,33 +42,38 @@
       </div>
     </div>
 
-    <!-- Tabelle der letzten Einnahmen -->
-    <div class="table-container" v-if="user">
-      <table>
-        <thead>
-          <tr>
-            <th>Betrag</th>
-            <th>Quelle</th>
-            <th>Datum</th>
-            <th>Aktionen</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="income in displayedIncomes" :key="income.id">
-            <td>{{ income.amount }}</td>
-            <td>{{ income.source }}</td>
-            <td>{{ new Date(income.created_at).toLocaleString() }}</td>
-            <td>
-              <button @click="startEdit(income)">Bearbeiten</button>
-              <button @click="deleteIncome(income.id)">Löschen</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Container für Tabelle und Diagramm -->
+    <div class="content-container" v-if="user">
+      <!-- Tabelle der letzten Einnahmen -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Betrag</th>
+              <th>Quelle</th>
+              <th>Datum</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="income in displayedIncomes" :key="income.id">
+              <td>{{ income.amount }}</td>
+              <td>{{ income.source }}</td>
+              <td>{{ new Date(income.created_at).toLocaleString() }}</td>
+              <td>
+                <button @click="startEdit(income)">Bearbeiten</button>
+                <button @click="deleteIncome(income.id)">Löschen</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <!-- Diagramm der Einnahmen -->
-    <canvas id="incomeChart"></canvas>
+      <!-- Diagramm der Einnahmen -->
+      <div class="chart-container">
+        <canvas id="incomeChart"></canvas>
+      </div>
+    </div>
   </div>
   <!-- Abmeldebutton -->
   <button @click="logout" v-if="user">Logout</button>
@@ -141,6 +149,22 @@ const displayedIncomes = computed(() => {
   return filteredIncomes.value.slice(-entryCount.value)
 })
 
+// Computed Property für das Gesamteinkommen
+const totalIncome = computed(() => {
+  return incomes.value.reduce((sum, income) => sum + income.amount, 0)
+})
+
+// Computed Property für kumulative Daten zum Diagramm
+const cumulativeIncomes = computed(() => {
+  const cumulativeData = []
+  let cumulativeSum = 0
+  for (const income of filteredIncomes.value) {
+    cumulativeSum += income.amount
+    cumulativeData.push({ date: new Date(income.created_at), amount: cumulativeSum })
+  }
+  return cumulativeData
+})
+
 // Computed Property für einzigartige Quellen
 const uniqueSources = computed(() => {
   return [...new Set(incomes.value.map(income => income.source))]
@@ -153,10 +177,10 @@ const uniqueDates = computed(() => {
 
 // Funktion zum Aktualisieren des Diagramms
 const updateChart = () => {
-  console.log('Aktualisiere das Diagramm mit folgenden Daten:', filteredIncomes.value)
+  console.log('Aktualisiere das Diagramm mit folgenden Daten:', cumulativeIncomes.value)
 
-  const labels = filteredIncomes.value.map(income => new Date(income.created_at))
-  const data = filteredIncomes.value.map(income => income.amount)
+  const labels = cumulativeIncomes.value.map(income => income.date)
+  const data = cumulativeIncomes.value.map(income => income.amount)
 
   console.log('Labels für das Diagramm:', labels)
   console.log('Daten für das Diagramm:', data)
@@ -177,7 +201,7 @@ const updateChart = () => {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Einkommen',
+        label: 'Kumulatives Einkommen',
         data: data,
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1
