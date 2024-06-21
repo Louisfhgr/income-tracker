@@ -1,7 +1,7 @@
 <template>
     <div>
-      <h1>Über uns</h1>
-      <p>Dies ist die Über uns Seite Ihrer Nuxt.js-Anwendung.</p>
+      <h1>Testseite</h1>
+      <p>Dies ist die Nuxt.js-Anwendung.</p>
     </div>
   </template>
   

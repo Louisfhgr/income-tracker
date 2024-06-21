@@ -4,8 +4,6 @@
     <p v-if="user">Angemeldet als: {{ user.email }}</p>
     <p v-else>Bitte melden Sie sich an.</p>
 
-    <!-- Gesamtbetrag anzeigen -->
-    <h2 v-if="user">Gesamteinkommen: {{ totalIncome }} €</h2>
 
     <!-- Formular zum Hinzufügen oder Bearbeiten von Einnahmen -->
     <form @submit.prevent="isEditing ? updateIncome() : addIncome()" v-if="user">
@@ -14,6 +12,9 @@
       <button type="submit">{{ isEditing ? 'Aktualisieren' : 'Hinzufügen' }}</button>
       <button @click="cancelEdit" type="button" v-if="isEditing">Abbrechen</button>
     </form>
+
+    <!-- Gesamtbetrag anzeigen -->
+    <h2 v-if="user">Gesamteinkommen: {{ totalIncome }} CHF</h2>
 
     <!-- Filteroptionen -->
     <div v-if="user" class="filter-container">
@@ -41,6 +42,7 @@
         <input v-model.number="entryCount" type="number" min="1" placeholder="Anzahl der Einträge" @input="updateChart" />
       </div>
     </div>
+
 
     <!-- Container für Tabelle und Diagramm -->
     <div class="content-container" v-if="user">
@@ -70,9 +72,7 @@
       </div>
 
       <!-- Diagramm der Einnahmen -->
-      <div class="chart-container">
-        <canvas id="incomeChart"></canvas>
-      </div>
+      <IncomeChart :cumulativeIncomes="cumulativeIncomes" />
     </div>
   </div>
   <!-- Abmeldebutton -->
@@ -82,12 +82,11 @@
 <script setup>
 // Importiere die notwendigen Module und Hooks von Vue
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import Chart from 'chart.js/auto'
-import 'chartjs-adapter-date-fns'
 import { useNuxtApp } from '#app'
 import { useRouter } from 'vue-router'
+import IncomeChart from '~/components/IncomeChart.vue'
 
-// Definiere die notwendigen Referenzen und Variablen
+// 
 const incomes = ref([])
 const amount = ref(0)
 const source = ref('')
@@ -96,7 +95,7 @@ const selectedDate = ref('')
 const user = ref(null)
 const isEditing = ref(false)
 const editIncomeId = ref(null)
-const entryCount = ref(5)  // Neue Variable für die Anzahl der Einträge
+const entryCount = ref(10)  
 
 // Zugriff auf Supabase und Router
 const { $supabase } = useNuxtApp()
@@ -175,57 +174,13 @@ const uniqueDates = computed(() => {
   return [...new Set(incomes.value.map(income => new Date(income.created_at).toISOString().split('T')[0]))]
 })
 
+// Watcher für gefilterte Daten, um das Diagramm zu aktualisieren
+watch(filteredIncomes, () => updateChart())
+
 // Funktion zum Aktualisieren des Diagramms
 const updateChart = () => {
   console.log('Aktualisiere das Diagramm mit folgenden Daten:', cumulativeIncomes.value)
-
-  const labels = cumulativeIncomes.value.map(income => income.date)
-  const data = cumulativeIncomes.value.map(income => income.amount)
-
-  console.log('Labels für das Diagramm:', labels)
-  console.log('Daten für das Diagramm:', data)
-
-  const ctx = document.getElementById('incomeChart')
-  if (!ctx) {
-    console.error('Canvas-Element mit ID "incomeChart" nicht gefunden')
-    return
-  }
-
-  const chartCtx = ctx.getContext('2d')
-  if (Chart.getChart(chartCtx)) {
-    Chart.getChart(chartCtx).destroy()
-  }
-
-  new Chart(chartCtx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Kumulatives Einkommen',
-        data: data,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'day'
-          }
-        },
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  })
 }
-
-// Watcher für gefilterte Daten, um das Diagramm zu aktualisieren
-watch(filteredIncomes, updateChart)
 
 // Funktion zum Hinzufügen neuer Einkommensdaten
 const addIncome = async () => {

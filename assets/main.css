@@ -49,10 +49,10 @@ select {
 }
 
 .table-container {
-  max-height: 200px; /* Feste Höhe für den Tabellenkörper */
+  max-height: 350px; /* Feste Höhe für den Tabellenkörper */
   overflow-y: auto; /* Ermöglicht das vertikale Scrollen */
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   flex: 1 1 50%; /* Flex-Einstellungen für responsive Design */
 }
 
@@ -79,15 +79,8 @@ thead th {
   z-index: 1; /* Stellt sicher, dass die Spaltenüberschriften über den anderen Zellen liegen */
 }
 
-/* Spezifische Stile für die Login-Seite */
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
+
+
 
 form {
   display: flex;
