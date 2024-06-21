@@ -38,8 +38,8 @@
 
       <!-- Filter nach Anzahl der Einträge -->
       <div class="filter-item">
-        <label for="entryCount">Anzahl der Einträge:</label>
-        <input v-model.number="entryCount" type="number" min="1" placeholder="Anzahl der Einträge" @input="updateChart" />
+        <label for="entryCount">Anzeige der Einträge:</label>
+        <input v-model.number="entryCount" type="number" min="1" placeholder="Anzahl Einträge" @input="updateChart" />
       </div>
     </div>
 
@@ -271,7 +271,7 @@ const logout = async () => {
   }
 }
 
-// Lifecycle Hooks zum Abrufen der Daten und Einrichten der Realtime-Subscription
+// Lifecycle Hooks
 onMounted(() => {
   fetchUser()
   const subscription = $supabase
